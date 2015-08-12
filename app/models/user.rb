@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
     foreign_key: :user_id,
     primary_key: :id
 
-  has_many :visited_urls,
+  has_many :visited_urls, -> { distinct },    # -> lambda designator
     through: :visits,
     source: :visited_url
 end
