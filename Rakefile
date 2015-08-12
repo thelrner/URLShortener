@@ -4,3 +4,7 @@
 require File.expand_path('../config/application', __FILE__)
 
 URLShortener::Application.load_tasks
+
+task :say_hello do        # can't do one-liner { }
+  ShortenedUrl.prune
+end

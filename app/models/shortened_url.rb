@@ -35,6 +35,10 @@ class ShortenedUrl < ActiveRecord::Base
     )
   end
 
+  def self.prune
+    visits.destroy_all("created_at < '#{1.day.ago.to_formatted_s(:db)}'")
+  end
+
   def num_clicks
     visits.count
   end
@@ -44,6 +48,7 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_recent_uniques
-    visits.where(:created_at => (10.minutes.ago..Time.new))
+    visits.where("created_at > ?", 60.minutes.ago.to_formatted_s(:db))
   end
+
 end
