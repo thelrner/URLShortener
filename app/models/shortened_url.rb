@@ -3,6 +3,7 @@ require 'securerandom'
 class ShortenedUrl < ActiveRecord::Base
   validates :short_url, uniqueness: true
   validates :long_url, :short_url, presence: true
+  validate :no_more_than_5_in_last_minute         # validate, not validates
 
   belongs_to :submitter,
     class_name: 'User',
@@ -37,6 +38,14 @@ class ShortenedUrl < ActiveRecord::Base
 
   def self.prune
     visits.destroy_all("created_at < '#{1.day.ago.to_formatted_s(:db)}'")
+  end
+
+  def no_more_than_5_in_last_minute
+    recent_posts = ShortenedUrl.where(user_id: user_id).
+                where("created_at > ?", 1.minute.ago.to_formatted_s(:db))
+    if recent_posts.count > 5
+      errors[:base] << "Can't create more than 5 short URLs in a minute!"
+    end
   end
 
   def num_clicks
